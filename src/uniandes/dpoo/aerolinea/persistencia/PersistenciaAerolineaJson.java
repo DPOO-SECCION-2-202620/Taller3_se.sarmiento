@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -116,23 +118,35 @@ public class PersistenciaAerolineaJson implements IPersistenciaAerolinea{
     private void salvarAeropuertos( Aerolinea aerolinea, JSONObject jobject )
     {
         JSONArray jAeropuertos = new JSONArray( );
+        Set<String> codigosGuardados = new HashSet<String>( );
+
         for( Ruta ruta : aerolinea.getRutas( ) )
         {
-            JSONObject jOrigen = new JSONObject( );
-            jOrigen.put( NOMBRE, ruta.getOrigen( ).getNombre( ) );
-            jOrigen.put( CODIGO, ruta.getOrigen( ).getCodigo( ) );
-            jOrigen.put( NOMBRE_CIUDAD, ruta.getOrigen( ).getNombreCiudad( ) );
-            jOrigen.put( LATITUD, ruta.getOrigen( ).getLatitud( ) );
-            jOrigen.put( LONGITUD, ruta.getOrigen( ).getLongitud( ) );
-            jAeropuertos.put( jOrigen );
+            Aeropuerto origen = ruta.getOrigen( );
+            if( !codigosGuardados.contains( origen.getCodigo( ) ) )
+            {
+                JSONObject jOrigen = new JSONObject( );
+                jOrigen.put( NOMBRE, origen.getNombre( ) );
+                jOrigen.put( CODIGO, origen.getCodigo( ) );
+                jOrigen.put( NOMBRE_CIUDAD, origen.getNombreCiudad( ) );
+                jOrigen.put( LATITUD, origen.getLatitud( ) );
+                jOrigen.put( LONGITUD, origen.getLongitud( ) );
+                jAeropuertos.put( jOrigen );
+                codigosGuardados.add( origen.getCodigo( ) );
+            }
 
-            JSONObject jDestino = new JSONObject( );
-            jDestino.put( NOMBRE, ruta.getDestino( ).getNombre( ) );
-            jDestino.put( CODIGO, ruta.getDestino( ).getCodigo( ) );
-            jDestino.put( NOMBRE_CIUDAD, ruta.getDestino( ).getNombreCiudad( ) );
-            jDestino.put( LATITUD, ruta.getDestino( ).getLatitud( ) );
-            jDestino.put( LONGITUD, ruta.getDestino( ).getLongitud( ) );
-            jAeropuertos.put( jDestino );
+            Aeropuerto destino = ruta.getDestino( );
+            if( !codigosGuardados.contains( destino.getCodigo( ) ) )
+            {
+                JSONObject jDestino = new JSONObject( );
+                jDestino.put( NOMBRE, destino.getNombre( ) );
+                jDestino.put( CODIGO, destino.getCodigo( ) );
+                jDestino.put( NOMBRE_CIUDAD, destino.getNombreCiudad( ) );
+                jDestino.put( LATITUD, destino.getLatitud( ) );
+                jDestino.put( LONGITUD, destino.getLongitud( ) );
+                jAeropuertos.put( jDestino );
+                codigosGuardados.add( destino.getCodigo( ) );
+            }
         }
         jobject.put( "aeropuertos", jAeropuertos );
     }
